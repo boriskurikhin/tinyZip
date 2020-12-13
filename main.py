@@ -3,35 +3,15 @@
 '''
     1. get huffman encoding to work
 '''
-
-class Node:
-    def __init__(self, prob, value, left = None, right = None, leaf = False):
-        self.prob = prob
-        self.value = value
-
-        self.left = left
-        self.right = right
-
-        self.leaf = leaf
-    
-    def __lt__(self, o):
-        return self.prob < o.prob
-    
-    def __str__(self):
-        return f'{self.value} ({self.prob})'
-
-bytes_required = 1
+from tree_node import Node
+from tree_node import create_encodings
+# bytes_required = 1
 import math
 
-def create_encodings(root, running):
-    global bytes_required
-
-    if root.leaf:
-        root.code = running
-        bytes_required = max(bytes_required, int(math.ceil(len(running) / 4.0)))
-        return
-    create_encodings(root.left, f'{running}0')
-    create_encodings(root.right, f'{running}1')
+# post-order traversal
+def write_tree(root, file):
+    if root.leaf: return [int(0).to_bytes(4, 'little'), bytes(root.value, 'utf-8')]
+    else: return [*write_tree(root.left, file), *write_tree(root.right, file), int(1).to_bytes(4, 'little')]
 
 from heapq import heappop, heappush
 from collections import Counter
@@ -68,13 +48,28 @@ while len(heap) >= 2:
     heappush(heap, (p, parent))
 
 _, root = heappop(heap)
-assert _ == 1, 'Something broke'
+assert _ == 1, 'Probabilities did not add up to 1'
 
 # at this stage we should create the encodings for each leaf
 create_encodings(root, '')
-print(bytes_required)
+# print(bytes_required)
 
 #attempt to encode string
 f = open('out.boris', 'wb')
+# total number of characters in uncompressed file
+# f.write(total.to_bytes(4, 'little'))
+
+''' header '''
+# first 4 bytes will be how many bytes are required per encoding
+# f.write(bytes_required.to_bytes(4, 'little'))
+# write the huffman-encoded string
+tree_bytes = write_tree(root, f)
+encoded = b''
 for c in contents:
-    f.write(int(reference[c].code[::-1], 2).to_bytes(bytes_required, 'little'))
+    encoded += bytes(reference[c].code, 'utf-8')
+f.write(len(tree_bytes).to_bytes(4, 'little'))
+f.write(len(encoded).to_bytes(4, 'little'))
+
+# write pre-order tree
+for b in tree_bytes: f.write(b)
+f.write(encoded)
