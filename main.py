@@ -20,9 +20,15 @@ class Node:
     def __str__(self):
         return f'{self.value} ({self.prob})'
 
+bytes_required = 1
+import math
+
 def create_encodings(root, running):
+    global bytes_required
+
     if root.leaf:
         root.code = running
+        bytes_required = max(bytes_required, int(math.ceil(len(running) / 4.0)))
         return
     create_encodings(root.left, f'{running}0')
     create_encodings(root.right, f'{running}1')
@@ -30,7 +36,7 @@ def create_encodings(root, running):
 from heapq import heappop, heappush
 from collections import Counter
 
-f = open('file.txt', 'r')
+f = open('mcbeth.txt', 'r')
 
 contents = f.read()
 
@@ -66,10 +72,9 @@ assert _ == 1, 'Something broke'
 
 # at this stage we should create the encodings for each leaf
 create_encodings(root, '')
+print(bytes_required)
 
 #attempt to encode string
-out = ''
+f = open('out.boris', 'wb')
 for c in contents:
-    out += reference[c].code
-print(out)
-
+    f.write(int(reference[c].code[::-1], 2).to_bytes(bytes_required, 'little'))
