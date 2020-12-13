@@ -5,18 +5,27 @@
 '''
 
 class Node:
-    def __init__(self, prob, value, left = None, right = None):
+    def __init__(self, prob, value, left = None, right = None, leaf = False):
         self.prob = prob
         self.value = value
 
         self.left = left
         self.right = right
+
+        self.leaf = leaf
     
     def __lt__(self, o):
         return self.prob < o.prob
     
     def __str__(self):
         return f'{self.value} ({self.prob})'
+
+def create_encodings(root, running):
+    if root.leaf:
+        root.code = running
+        return
+    create_encodings(root.left, f'{running}0')
+    create_encodings(root.right, f'{running}1')
 
 from heapq import heappop, heappush
 from collections import Counter
@@ -28,10 +37,13 @@ contents = f.read()
 nodes = Counter(contents)
 total = len(contents)
 heap = []
+reference = {}
 
 for node in nodes:
     p = nodes[node] / total
-    heappush(heap, (p, Node(p, node)))
+    n = Node(p, node, None, None, True)
+    heappush(heap, (p, n))
+    reference[node] = n
 
 while len(heap) >= 2:
     p1, n1 = heappop(heap)
@@ -52,15 +64,12 @@ while len(heap) >= 2:
 _, root = heappop(heap)
 assert _ == 1, 'Something broke'
 
+# at this stage we should create the encodings for each leaf
+create_encodings(root, '')
 
-
-
-
-
-
-
-
-
-
-
+#attempt to encode string
+out = ''
+for c in contents:
+    out += reference[c].code
+print(out)
 
