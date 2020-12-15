@@ -12,12 +12,13 @@ class Node:
         return self.count < o.count
 
 # creates the huffman encodings for all leaves of the tree
-def create_encodings(root: Node, running: int):
-    if root.leaf: 
+def create_encodings(root: Node, running: int, mapping = None):
+    if root.leaf:
+        if mapping != None: mapping[running] = root.value
         root.code = running
     else:
-        create_encodings(root.left, running << 1)
-        create_encodings(root.right, (running << 1) | 1)
+        create_encodings(root.left, running << 1, mapping)
+        create_encodings(root.right, (running << 1) | 1, mapping)
 
 # post-order traversal
 def write_tree(root: Node):

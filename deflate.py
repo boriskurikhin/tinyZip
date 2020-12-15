@@ -9,6 +9,7 @@ f = open('out.boris', 'rb')
 treeBytes = int.from_bytes(f.read(4), byteorder='little')
 encodedSize = int.from_bytes(f.read(4), byteorder='little')
 
+ref = {}
 stack = []
 i = 0
 # read tree
@@ -26,19 +27,10 @@ while i < treeBytes:
 
 root = stack.pop()
 out_file = open('out.txt', 'w')
-create_encodings(root, 0)
-
+create_encodings(root, 0, ref)
 i = 0
 cur = root
-while i <= encodedSize:
+while i < encodedSize:
     buffer = int.from_bytes(f.read(3), 'little')
-    if buffer == 0:
-        out_file.write(chr(root.left.value))
-    else:
-        while buffer:
-            if buffer & 1: cur = cur.right
-            else: cur = cur.left
-            buffer >>= 1
-        out_file.write(chr(cur.value))
-        cur = root
-    i += 1
+    out_file.write(chr(ref[buffer]))
+    i += 3
