@@ -50,9 +50,9 @@ def huffman(inp: bytes, file) -> bytes:
     file.write(encoded)
 
 
-f = open('file.txt', 'rb')
+f = open('mcbeth.txt', 'rb')
 s = lz77(bytes(f.read()))
-print(s)
+# print(s)
 # print(str(s, 'utf-8'))
 tree = huffman(s, open('out.boris', 'wb'))
 # print(tree)
