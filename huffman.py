@@ -44,6 +44,7 @@ def huffman(inp: bytes, file) -> bytes:
     for byte in inp:
         encoded += reference[byte].code.to_bytes(3, 'little')
     file.write(len(encoded).to_bytes(4, 'little'))
+    # print(len(treeBytes), len(encoded))
     file.write(treeBytes)
     print(treeBytes)
     file.write(encoded)

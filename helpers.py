@@ -14,7 +14,6 @@ class Node:
 # creates the huffman encodings for all leaves of the tree
 def create_encodings(root: Node, running: int):
     if root.leaf: 
-        print(bin(running))
         root.code = running
     else:
         create_encodings(root.left, running << 1)
@@ -22,5 +21,5 @@ def create_encodings(root: Node, running: int):
 
 # post-order traversal
 def write_tree(root: Node):
-    if root.leaf:  return b'0' + root.value.to_bytes(2, 'little')
+    if root.leaf:  return (root.value << 1).to_bytes(3, 'little')
     else: return write_tree(root.left) + write_tree(root.right) + (1).to_bytes(3, 'little') # 3 bytes for now

@@ -14,35 +14,31 @@ i = 0
 # read tree
 while i < treeBytes:
     buffer = f.read(3)
-    check = buffer[0] & 1
-    if check == 0:
-        print('here 1')
-        i += 1
-        print(bin(int.from_bytes(buffer[1:], 'little')))
-        stack.append(Node(0, int.from_bytes(buffer, 'little'), None, None, True))
+    check = int.from_bytes(buffer, 'little')
+    if check != 1:
+        stack.append(Node(0, check >> 1, None, None, True))
     else:
-        print('here 2')
         right = stack.pop()
         left = stack.pop()
-        n = Node(0, '', left, right)
+        n = Node(0, None, left, right)
         stack.append(n)
-    i += 1
+    i += 3
+
 root = stack.pop()
-# out_file = open('out.txt', 'w')
+out_file = open('out.txt', 'w')
+create_encodings(root, 0)
 
-# create_encodings(root, 0)
-
-# i = 0
-
-# cur = root
-# print(root.left.value)
-# while i <= encodedSize:
-#     if cur.leaf:
-#         out_file.write(chr(cur.value))
-#         cur = root
-#         continue
-#     buffer = f.read(3)
-#     node = int.from_bytes(buffer, 'big') & (1 << 23)
-#     if not node: cur = cur.left
-#     else: cur = cur.right
-#     i += 1
+i = 0
+cur = root
+while i <= encodedSize:
+    buffer = int.from_bytes(f.read(3), 'little')
+    if buffer == 0:
+        out_file.write(chr(root.left.value))
+    else:
+        while buffer:
+            if buffer & 1: cur = cur.right
+            else: cur = cur.left
+            buffer >>= 1
+        out_file.write(chr(cur.value))
+        cur = root
+    i += 1
