@@ -15,6 +15,7 @@ class Node:
 def create_encodings(root: Node, running: int, mapping = None):
     if root.leaf:
         if mapping != None: mapping[running] = root.value
+        print(bin(running), chr(root.value))
         root.code = running
     else:
         create_encodings(root.left, running << 1, mapping)
