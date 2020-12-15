@@ -3,15 +3,10 @@
 '''
     1. get huffman encoding to work
 '''
-from tree_node import Node
-from tree_node import create_encodings
+from helpers import Node, create_encodings, write_tree
+from helpers import create_encodings
 # bytes_required = 1
 import math
-
-# post-order traversal
-def write_tree(root, file):
-    if root.leaf: return [int(0).to_bytes(4, 'little'), bytes(root.value, 'utf-8')]
-    else: return [*write_tree(root.left, file), *write_tree(root.right, file), int(1).to_bytes(4, 'little')]
 
 from heapq import heappop, heappush
 from collections import Counter

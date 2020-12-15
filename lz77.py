@@ -1,6 +1,6 @@
 
 # find the longest match in the running window
-def findLongestMatch(searchSpace: bytearray, matchBytes: bytearray) -> tuple:
+def findLongestMatch(searchSpace: bytes, matchBytes: bytes) -> tuple:
     matchLength = len(matchBytes)
     searchSize = len(searchSpace)
     while matchLength > 0:
@@ -10,7 +10,8 @@ def findLongestMatch(searchSpace: bytearray, matchBytes: bytearray) -> tuple:
         matchLength -= 1
     return 0, 0
 
-def lz77rev (inp: bytearray) -> bytearray:
+# convert lz77 compressed file back into bytes
+def lz77rev (inp: bytes) -> bytes:
     length, index = len(inp), 0
     output, j = b'', 0
     for i in range(0, length, 3):
@@ -40,9 +41,4 @@ def lz77 (inp: bytes) -> bytes:
         output += ((0xF00 & relativePos) >> 8 | (0xF & matchLength) << 4).to_bytes(1, byteorder='little') # 4 bits of position and 4 bits of length
         output += nextChar.to_bytes(1, byteorder='little') # 8 bits of next character
         index += max(1, matchLength)
-    return output    
-
-
-k = lz77(bytes('hello hello', 'utf-8'))
-print(k)
-print(lz77rev(k))
+    return output
