@@ -2,6 +2,7 @@
 
 from helpers import Node
 from helpers import create_encodings
+from lz77 import lz77rev
 
 f = open('out.boris', 'rb')
 
@@ -9,7 +10,6 @@ f = open('out.boris', 'rb')
 treeBytes = int.from_bytes(f.read(4), byteorder='little')
 encodedSize = int.from_bytes(f.read(4), byteorder='little')
 
-ref = {}
 stack = []
 i = 0
 # read tree
@@ -26,11 +26,24 @@ while i < treeBytes:
     i += 3
 
 root = stack.pop()
-out_file = open('out.txt', 'w')
-create_encodings(root, 0, ref)
+out_file = open('out.txt', 'wb')
+create_encodings(root, b'')
+
+output = b''
+
 i = 0
 cur = root
-while i < encodedSize:
-    buffer = int.from_bytes(f.read(3), 'little')
-    out_file.write(chr(ref[buffer]))
-    i += 3
+while i <= encodedSize:
+    if cur.leaf:
+        # print(cur.value)
+        output += cur.value.to_bytes(3, 'big')
+        cur = root
+        continue
+    x = bytes(f.read(1))
+    if x == b'0': cur = cur.left
+    elif x == b'1': cur = cur.right
+    i += 1
+
+# print(output)
+out_file.write(lz77rev(output))
+

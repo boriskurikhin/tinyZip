@@ -33,7 +33,7 @@ def huffman(inp: bytes, file) -> bytes:
         heappush(heap, (joinedFreq, node))
 
     totalBytes, root = heappop(heap)
-    create_encodings(root, 0)
+    create_encodings(root, b'')
 
     treeBytes = write_tree(root)
     # 3 bytes per node, not very good.
@@ -42,7 +42,7 @@ def huffman(inp: bytes, file) -> bytes:
     # begin writing to file
     file.write(len(treeBytes).to_bytes(4, 'little'))
     for byte in inp:
-        encoded += reference[byte].code.to_bytes(3, 'little')
+        encoded += reference[byte].code
     file.write(len(encoded).to_bytes(4, 'little'))
     # print(len(treeBytes), len(encoded))
     file.write(treeBytes)
@@ -51,6 +51,7 @@ def huffman(inp: bytes, file) -> bytes:
 
 
 f = open('file.txt', 'rb')
-s = f.read()
+s = lz77(bytes(f.read()))
+print(str(s, 'utf-8'))
 tree = huffman(s, open('out.boris', 'wb'))
 print(tree)

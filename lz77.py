@@ -42,3 +42,7 @@ def lz77 (inp: bytes) -> bytes:
         output += nextChar.to_bytes(1, byteorder='little') # 8 bits of next character
         index += max(1, matchLength)
     return output
+
+# f = open('file.txt', 'rb')
+# enc = lz77(bytes(f.read()))
+# print(lz77rev(enc))
