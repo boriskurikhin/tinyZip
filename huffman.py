@@ -46,12 +46,13 @@ def huffman(inp: bytes, file) -> bytes:
     file.write(len(encoded).to_bytes(4, 'little'))
     # print(len(treeBytes), len(encoded))
     file.write(treeBytes)
-    print(treeBytes)
+    # print(treeBytes)
     file.write(encoded)
 
 
 f = open('file.txt', 'rb')
 s = lz77(bytes(f.read()))
-print(str(s, 'utf-8'))
+print(s)
+# print(str(s, 'utf-8'))
 tree = huffman(s, open('out.boris', 'wb'))
-print(tree)
+# print(tree)

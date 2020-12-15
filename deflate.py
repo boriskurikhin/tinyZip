@@ -35,8 +35,8 @@ i = 0
 cur = root
 while i <= encodedSize:
     if cur.leaf:
-        # print(cur.value)
-        output += cur.value.to_bytes(3, 'big')
+        output += cur.value.to_bytes(1, 'little')
+        # output += cur.value.to_bytes(3, 'little')
         cur = root
         continue
     x = bytes(f.read(1))
@@ -44,6 +44,5 @@ while i <= encodedSize:
     elif x == b'1': cur = cur.right
     i += 1
 
-# print(output)
 out_file.write(lz77rev(output))
 
