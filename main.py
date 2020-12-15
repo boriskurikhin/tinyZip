@@ -16,7 +16,7 @@ def write_tree(root, file):
 from heapq import heappop, heappush
 from collections import Counter
 
-f = open('mcbeth.txt', 'r')
+f = open('test.mp4', 'r')
 
 contents = f.read()
 
