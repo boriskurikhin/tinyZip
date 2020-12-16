@@ -42,8 +42,20 @@ void buildEncodings(Node * root, unsigned int encoding) {
 
 int getTreeSize (Node * root) {
     if (root->isLeaf)
-        return 4 + 1; // 4 bytes per node + 1 byte for indicator
+        return 2; // 4 bytes per node + 1 byte for indicator
     return 1 + getTreeSize(root->left) + getTreeSize(root->right);
+}
+
+void writeTreeToFile (Node * root, FILE * outFile) {
+    if (root->isLeaf) {
+        fwrite("0", 1, 1, outFile);
+        char buf[1] = { root->value };
+        fwrite(buf, 1, 1, outFile);
+    } else {
+        writeTreeToFile(root->left, outFile);
+        writeTreeToFile(root->right, outFile);
+        fwrite("1", 1, 1, outFile);
+    }
 }
 
 /* Read input file */
@@ -65,7 +77,7 @@ int main()
 {
 
     FILE *inputFile = fopen("input.txt", "rb");
-    FILE *outputFile = fopen("output.txt", "wb");
+    FILE *outputFile = fopen("output.boris", "wb");
 
     char *buffer = (char *)readInput(inputFile);
     int inputSize = strlen(buffer);
@@ -111,12 +123,19 @@ int main()
 
     /* write the size of tree as an int */
     fwrite(reinterpret_cast<const char *>(&treeSize), sizeof(int), 1, outputFile);
+    /* write tree to file */
+    writeTreeToFile(root, outputFile);
 
     /* This writes the huffman encoding in 4 bytes */
     for (int i = 0; i < inputSize; i++) {
         std::cout << std::bitset<32>(referece[buffer[i]]->code) << std::endl;
         fwrite(reinterpret_cast<const char *>(&referece[buffer[i]]->code), sizeof(int), 1, outputFile);
     }
+
+
+    fclose(inputFile);
+    fclose(outputFile);
+    free(buffer);
 
     return 0;
 }
