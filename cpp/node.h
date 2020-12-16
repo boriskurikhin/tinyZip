@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string>
 
 class Node {
     public:
@@ -7,7 +8,7 @@ class Node {
         Node * left;
         Node * right;
         char value;
-        unsigned int code;
+        std::string code;
         
         Node(unsigned int c, char v) {
             count = c;

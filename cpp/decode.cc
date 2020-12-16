@@ -5,17 +5,13 @@
 #include <stack>
 #include "node.h"
 
-std::map<unsigned int, Node*> ref;
-
-void buildEncodings(Node * root, unsigned int encoding) {
+void buildEncodings(Node * root, std::string encoding) {
     if (root->isLeaf) {
-        // std::cout << (char) root->value << " " << std::bitset<32>(encoding) << std::endl;
-        ref[encoding] = root;
         root->code = encoding;
         return;
     }
-    if (root->left != NULL) buildEncodings(root->left, encoding << 1);
-    if (root->right != NULL) buildEncodings(root->right, (encoding << 1) | 1);
+    if (root->left != NULL) buildEncodings(root->left, encoding + "0");
+    if (root->right != NULL) buildEncodings(root->right, encoding + "1");
 }
 
 std::stack<Node*> stack;
@@ -73,16 +69,39 @@ int main()
     Node * root = stack.top();
     stack.pop();
 
-    std::cout << "here" << std::endl;
+    buildEncodings(root, "");
 
-    buildEncodings(root, INT_MAX & ~1);
+    unsigned char read = 0;
+    int charsRead = 0;
 
-    while (i < fileSize) {
-        unsigned int code;
+    /*
         fseek(inputFile, 0L + i, SEEK_SET);
         fread(&code, sizeof(unsigned int), 1, inputFile);
         fwrite(&ref[code]->value, 1, 1, ouputFile);
-        i += 4;
+    */
+
+    Node * cur = root;
+
+    while (i < fileSize) {
+        /* go to line */
+        fseek(inputFile, 0L + i, SEEK_SET);
+        fread(&read, sizeof(unsigned char), 1, inputFile);
+        
+        charsRead = 0;
+        while (charsRead < 8) {
+            /* if we found an encoding */
+            if (cur->isLeaf) {
+                fwrite(&cur->value, 1, 1, ouputFile);
+                cur = root;
+            }
+
+            /* check if bit is set */
+            if (read & (1 << (7 - charsRead))) cur = cur->right;
+            else cur = cur->left;
+            charsRead++;
+        }
+
+        i += 1;
     }
 
     fclose(inputFile);

@@ -5,18 +5,18 @@
 #include <vector>
 #include "node.h"
 
-void buildEncodings(Node * root, unsigned int encoding) {
+void buildEncodings(Node * root, std::string encoding) {
     if (root->isLeaf) {
         root->code = encoding;
         return;
     }
-    if (root->left != NULL) buildEncodings(root->left, encoding << 1);
-    if (root->right != NULL) buildEncodings(root->right, (encoding << 1) | 1);
+    if (root->left != NULL) buildEncodings(root->left, encoding + "0");
+    if (root->right != NULL) buildEncodings(root->right, encoding + "1");
 }
 
 int getTreeSize (Node * root) {
     if (root->isLeaf)
-        return 2; // 4 bytes per node + 1 byte for indicator
+        return 2; // 2 bytes per node
     return 1 + getTreeSize(root->left) + getTreeSize(root->right);
 }
 
@@ -87,8 +87,7 @@ int main()
 
     std::cout << treeSize << std::endl;
 
-    /* 1111111111111(0)....whatever is here .... is good */
-    buildEncodings(root, INT_MAX & ~1);
+    buildEncodings(root, "");
 
     /* write the size of tree as an int */
     fwrite(reinterpret_cast<const char *>(&treeSize), sizeof(int), 1, outputFile);
@@ -97,10 +96,21 @@ int main()
 
     /* This writes the huffman encoding in 4 bytes */
     unsigned int * write_value = (unsigned int *) malloc(sizeof(unsigned int));
+    
+    unsigned char write = 0;
+    int written = 0;
+
     for (int i = 0; i < inputSize; i++) {
-        // std::cout << std::bitset<32>(referece[buffer[i]]->code) << std::endl;
-        int code = referece[buffer[i]]->code;        
-        fwrite(&code, sizeof(unsigned int), 1, outputFile);
+        std::string code = referece[buffer[i]]->code;    
+        for (int j = 0; j < code.size(); j++) {
+            /* write a byte at a time */
+            if (written == 8) {
+                fwrite(&write, sizeof(unsigned char), 1, outputFile);
+                write = 0;
+                written = 0;
+            }
+            write |= (code[j] == '1') << (7 - written++);
+        }
     }
 
     fclose(inputFile);
