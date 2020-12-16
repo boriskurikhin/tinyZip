@@ -8,6 +8,7 @@
 void buildEncodings(Node * root, std::string encoding) {
     if (root->isLeaf) {
         root->code = encoding;
+        std::cout << encoding << std::endl;
         return;
     }
     if (root->left != NULL) buildEncodings(root->left, encoding + "0");
@@ -74,31 +75,29 @@ int main()
     unsigned char read = 0;
     int charsRead = 0;
 
-    /*
-        fseek(inputFile, 0L + i, SEEK_SET);
-        fread(&code, sizeof(unsigned int), 1, inputFile);
-        fwrite(&ref[code]->value, 1, 1, ouputFile);
-    */
-
     Node * cur = root;
 
     while (i < fileSize) {
         /* go to line */
         fseek(inputFile, 0L + i, SEEK_SET);
         fread(&read, sizeof(unsigned char), 1, inputFile);
-        
-        charsRead = 0;
-        while (charsRead < 8) {
-            /* if we found an encoding */
+
+        for (int j = 0; j < 8; j++) {
+            
             if (cur->isLeaf) {
                 fwrite(&cur->value, 1, 1, ouputFile);
                 cur = root;
             }
 
-            /* check if bit is set */
-            if (read & (1 << (7 - charsRead))) cur = cur->right;
+            // move in the tree 
+            if (read & (1 << (7 - j))) cur = cur->right;
             else cur = cur->left;
-            charsRead++;
+
+            if (cur->isLeaf) {
+                fwrite(&cur->value, 1, 1, ouputFile);
+                cur = root;
+            }
+
         }
 
         i += 1;

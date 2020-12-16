@@ -101,7 +101,7 @@ int main()
     int written = 0;
 
     for (int i = 0; i < inputSize; i++) {
-        std::string code = referece[buffer[i]]->code;    
+        std::string code = referece[buffer[i]]->code;
         for (int j = 0; j < code.size(); j++) {
             /* write a byte at a time */
             if (written == 8) {
@@ -109,9 +109,14 @@ int main()
                 write = 0;
                 written = 0;
             }
-            write |= (code[j] == '1') << (7 - written++);
+            write |= (code[j] == '1') << (7 - written);
+            written++;
         }
     }
+
+    /* write the rest */
+    if (written < 8)
+        fwrite(&write, sizeof(unsigned char), 1, outputFile);
 
     fclose(inputFile);
     fclose(outputFile);
