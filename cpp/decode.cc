@@ -1,34 +1,9 @@
 #include <iostream>
-#include <stdio.h>
 #include <map>
 #include <queue>
 #include <bitset>
-#include <vector>
 #include <stack>
-
-class Node {
-    public:
-        unsigned int count;
-        bool isLeaf;
-        Node * left;
-        Node * right;
-        char value;
-        unsigned int code;
-        
-        Node(int c, char v) {
-            count = c;
-            value = v;
-            left = NULL;
-            right = NULL;
-            isLeaf = false;
-        }
-};
-
-struct Compare {
-    bool operator()(Node * a, Node * b) {
-        return a->count > b->count;
-    }
-};
+#include "node.h"
 
 std::map<unsigned int, Node*> ref;
 
@@ -49,6 +24,8 @@ int main()
 {
 
     FILE *inputFile = fopen("output.boris", "rb");
+    FILE *ouputFile = fopen("output.txt", "wb");
+
     int fileSize;
 
     fseek(inputFile, 0L, SEEK_END);
@@ -60,7 +37,10 @@ int main()
     fread(buffer, 1, fileSize, inputFile);
 
     // first 4 bytes represent the tree size
-    int treeSize = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+    int treeSize;
+    fseek(inputFile, 0L, SEEK_SET);
+    fread(&treeSize, sizeof(int), 1, inputFile);
+    std::cout << treeSize << std::endl;
     int i = 4;
 
     /* Start reading in the tree */
@@ -69,7 +49,6 @@ int main()
     while (i - 4 < treeSize) {
         if (buffer[i] == '0') {
             // 2 bytes
-            std::cout << "creating child " << buffer[i + 1] << std::endl;
             Node * leaf = new Node(0, buffer[i + 1]);
             leaf->isLeaf = true;
             
@@ -91,10 +70,10 @@ int main()
         }
     }
 
-    std::cout << "Here" << std::endl;
-
     Node * root = stack.top();
     stack.pop();
+
+    std::cout << "here" << std::endl;
 
     buildEncodings(root, INT_MAX & ~1);
 
@@ -102,13 +81,12 @@ int main()
         unsigned int code;
         fseek(inputFile, 0L + i, SEEK_SET);
         fread(&code, sizeof(unsigned int), 1, inputFile);
-        std::cout << ref[code]->value;
+        fwrite(&ref[code]->value, 1, 1, ouputFile);
         i += 4;
     }
 
-    std::cout << std::endl;
-
-   
+    fclose(inputFile);
+    fclose(ouputFile);
 
     return 0;
 }

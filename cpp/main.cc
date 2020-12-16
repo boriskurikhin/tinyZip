@@ -1,35 +1,9 @@
 #include <iostream>
-#include <stdio.h>
 #include <map>
 #include <queue>
 #include <bitset>
 #include <vector>
-
-class Node {
-    public:
-        unsigned int count;
-        bool isLeaf;
-        Node * left;
-        Node * right;
-        char value;
-        unsigned int code;
-        
-        Node(unsigned int c, char v) {
-            count = c;
-            value = v;
-
-            left = NULL;
-            right = NULL;
-            isLeaf = false;
-        }
-};
-
-struct Compare {
-    bool operator()(Node * a, Node * b) {
-        return a->count > b->count;
-    }
-};
-
+#include "node.h"
 
 void buildEncodings(Node * root, unsigned int encoding) {
     if (root->isLeaf) {
@@ -110,6 +84,8 @@ int main()
 
     Node * root = queue.top();
     int treeSize = getTreeSize(root);
+
+    std::cout << treeSize << std::endl;
 
     /* 1111111111111(0)....whatever is here .... is good */
     buildEncodings(root, INT_MAX & ~1);
