@@ -16,13 +16,8 @@ void undoLZ77 (char * input, int fileSize, FILE * output ) {
         int matchLength = (input[index + 1] & 0xF0) >> 4;
         char nextChar = input[index + 2];
 
-        std::cout << running << std::endl;
-        std::cout<< "printing " << relativePos << " " << matchLength << " done" << std::endl;
-
         if (matchLength) {
             int subsrIndex = j - relativePos;
-            std::cout << running << std::endl;
-            std::cout << running.size() - relativePos << std::endl;
             std::string ss = running.substr(running.size() - relativePos, matchLength);
             fwrite(ss.c_str(), matchLength, 1, output);
             running += ss;

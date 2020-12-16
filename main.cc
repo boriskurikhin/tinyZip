@@ -49,8 +49,8 @@ std::priority_queue<Node*, std::vector<Node*>, Compare> queue;
 int main()
 {
 
-    FILE *inputFile = fopen("input.txt", "rb");
-    FILE *outputFile = fopen("huffman.b", "wb");
+    FILE *inputFile = fopen("output.b", "rb");
+    FILE *outputFile = fopen("both.b", "wb");
 
     auto input = readInput(inputFile);
 
