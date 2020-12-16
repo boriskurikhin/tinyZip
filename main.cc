@@ -32,14 +32,14 @@ void writeTreeToFile (Node * root, FILE * outFile) {
 }
 
 /* Read input file */
-void * readInput(FILE *inputFile) {
+std::pair<char *, int> readInput(FILE *inputFile) {
     unsigned long inputFileSize = 0;
     fseek(inputFile, 0, SEEK_END);
     inputFileSize = ftell(inputFile);
     fseek(inputFile, 0, SEEK_SET);
-    void *buffer = malloc(inputFileSize);
+    char *buffer = (char*) malloc(inputFileSize);
     fread(buffer, 1, inputFileSize, inputFile);
-    return buffer;
+    return std::make_pair(buffer, inputFileSize);
 }
 
 std::map<char, unsigned int> freqency;
@@ -49,12 +49,13 @@ std::priority_queue<Node*, std::vector<Node*>, Compare> queue;
 int main()
 {
 
-    FILE *inputFile = fopen("input.txt", "rb");
-    FILE *outputFile = fopen("output.boris", "wb");
+    FILE *inputFile = fopen("output.boris", "rb");
+    FILE *outputFile = fopen("output2.boris", "wb");
 
-    char *buffer = (char *)readInput(inputFile);
-    int inputSize = strlen(buffer);
+    auto input = readInput(inputFile);
 
+    char *buffer = input.first;
+    int inputSize = input.second;
 
     for (int i = 0; i < inputSize; i++)
         freqency[buffer[i]] += 1;
