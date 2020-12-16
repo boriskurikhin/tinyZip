@@ -85,7 +85,7 @@ int main()
     Node * root = queue.top();
     int treeSize = getTreeSize(root);
 
-    std::cout << treeSize << std::endl;
+    // std::cout << treeSize << std::endl;
 
     buildEncodings(root, "");
 
