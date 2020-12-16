@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <string>
 
 int max(int a, int b) {
     return a > b ? a : b;
@@ -12,29 +13,25 @@ int min(int a, int b) {
 }
 
 // find the longest match
-std::pair<unsigned int, unsigned int> findLongest(char * buffer, int searchStart, int matchEnd, int idx) {
-    unsigned int matchLength = matchEnd - idx;
-    unsigned int searchSize = idx - searchStart;
-    char * buf, * match, * space;
+std::pair<int, int> findLongest(char * buffer, int searchStart, int matchEnd, int idx) {
+    int matchLength = matchEnd - idx;
+    int searchSize = idx - searchStart;
+
+    std::string space = "", match = "";
 
     /* string in which we will be looking for stuff */
-    space = (char *) malloc (searchSize);
-    for (int j = searchStart, k = 0; j < idx; j++, k++)
-        space[k] = buffer[j];
+    for (int i = searchStart; i < idx; i++)
+        space += buffer[i];
+    
+    /* what we're looking for */
+    for (int i = idx; i < matchEnd; i++)
+        match += buffer[i];
 
-    while (matchLength) {
-        // if (buf != NULL) free(buf);
-        buf = (char *) malloc(matchLength);
-
-        /* copy the string into here */
-        for (int j = 0; j < matchLength; j++)
-            buf[j] = buffer[idx + j];
-
-        char * result = (char *) strstr(space, buf);
-
-        if (result != NULL )
-            return std::make_pair(searchSize - (result - space), matchLength);
-        matchLength--;
+    while (match.size()) {
+        int found = space.rfind(match);
+        if (found != std::string::npos)
+            return std::make_pair(searchSize - found, match.size());
+        match.pop_back();
     }
 
     return std::make_pair(0, 0);

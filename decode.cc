@@ -8,21 +8,29 @@
 
 void undoLZ77 (char * input, int fileSize, FILE * output ) {
     int index = 0, j = 0;
-    std::string optimizeLater;
+    char buffer[fileSize];
+    std::string running = "";
+
     while (index < fileSize) {
         int relativePos = input[index] | ((input[index+1] & 0x0F) << 8);
         int matchLength = (input[index + 1] & 0xF0) >> 4;
         char nextChar = input[index + 2];
-        
+
+        std::cout << running << std::endl;
+        std::cout<< "printing " << relativePos << " " << matchLength << " done" << std::endl;
+
         if (matchLength) {
-            std::string prev = optimizeLater.substr(j - relativePos, matchLength);
-            fwrite(prev.c_str(), 1, matchLength, output);
-            optimizeLater += prev;
+            int subsrIndex = j - relativePos;
+            std::cout << running << std::endl;
+            std::cout << running.size() - relativePos << std::endl;
+            std::string ss = running.substr(running.size() - relativePos, matchLength);
+            fwrite(ss.c_str(), matchLength, 1, output);
+            running += ss;
             j += matchLength;
         } else if (nextChar) {
             fwrite(&nextChar, 1, 1, output);
-            optimizeLater += nextChar;
-            j += 1;
+            running += nextChar;
+            j++;
         }
 
         index += 3;
