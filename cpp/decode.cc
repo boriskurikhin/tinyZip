@@ -43,14 +43,7 @@ void buildEncodings(Node * root, unsigned int encoding) {
     if (root->right != NULL) buildEncodings(root->right, (encoding << 1) | 1);
 }
 
-int getTreeSize (Node * root) {
-    if (root->isLeaf)
-        return 4 + 1; // 4 bytes per node + 1 byte for indicator
-    return 1 + getTreeSize(root->left) + getTreeSize(root->right);
-}
-
 std::stack<Node*> stack;
-
 
 int main()
 {
@@ -62,23 +55,21 @@ int main()
     fileSize = ftell(inputFile);
     fseek(inputFile, 0L, SEEK_SET);
 
-
     /* read the encoded file */
     char buffer[fileSize];
     fread(buffer, 1, fileSize, inputFile);
 
     // first 4 bytes represent the tree size
     int treeSize = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-    treeSize += 4;
     int i = 4;
 
     /* Start reading in the tree */
     /* And re-building it */
 
-    while (i < treeSize) {
-        std::cout << i << std::endl;
+    while (i - 4 < treeSize) {
         if (buffer[i] == '0') {
             // 2 bytes
+            std::cout << "creating child " << buffer[i + 1] << std::endl;
             Node * leaf = new Node(0, buffer[i + 1]);
             leaf->isLeaf = true;
             
@@ -100,13 +91,17 @@ int main()
         }
     }
 
+    std::cout << "Here" << std::endl;
+
     Node * root = stack.top();
     stack.pop();
 
     buildEncodings(root, INT_MAX & ~1);
 
     while (i < fileSize) {
-        int code = buffer[i + 0] | (buffer[i + 1] << 8) | (buffer[i + 2] << 16) | (buffer[i + 3] << 24);
+        unsigned int code;
+        fseek(inputFile, 0L + i, SEEK_SET);
+        fread(&code, sizeof(unsigned int), 1, inputFile);
         std::cout << ref[code]->value;
         i += 4;
     }

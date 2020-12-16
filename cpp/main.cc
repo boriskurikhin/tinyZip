@@ -14,9 +14,10 @@ class Node {
         char value;
         unsigned int code;
         
-        Node(int c, char v) {
+        Node(unsigned int c, char v) {
             count = c;
             value = v;
+
             left = NULL;
             right = NULL;
             isLeaf = false;
@@ -32,7 +33,6 @@ struct Compare {
 
 void buildEncodings(Node * root, unsigned int encoding) {
     if (root->isLeaf) {
-        // std::cout << (char) root->value << " " << std::bitset<32>(encoding) << std::endl;
         root->code = encoding;
         return;
     }
@@ -49,8 +49,7 @@ int getTreeSize (Node * root) {
 void writeTreeToFile (Node * root, FILE * outFile) {
     if (root->isLeaf) {
         fwrite("0", 1, 1, outFile);
-        char buf[1] = { root->value };
-        fwrite(buf, 1, 1, outFile);
+        fwrite(&root->value, 1, 1, outFile);
     } else {
         writeTreeToFile(root->left, outFile);
         writeTreeToFile(root->right, outFile);
@@ -89,20 +88,17 @@ int main()
     // create references and add to the queue
     for (const auto &[k, v] : freqency) {
         // add to reference map
-        // std::cout << "adding" << " " << k << " with " << v << " value" << std::endl;
         Node * node = new Node(v, k);
         node->isLeaf = true;
         queue.emplace(node);
         referece[k] = node;
     }
 
-    while (queue.size()) {
+    while (queue.size() >= 2) {
         Node * first = queue.top();
         queue.pop();
         Node * second = queue.top();
         queue.pop();
-
-        std::cout << first->count << " " << second->count << std::endl;
 
         Node * n = new Node(first->count + second->count, 0xFF & (first->value + second->value));
         n->isLeaf = false;
@@ -112,11 +108,8 @@ int main()
         queue.emplace(n);
     }
 
-    std::cout << "Here" << std::endl;
     Node * root = queue.top();
     int treeSize = getTreeSize(root);
-
-    std::cout << "size of tree is " << treeSize << " bytes" << std::endl;
 
     /* 1111111111111(0)....whatever is here .... is good */
     buildEncodings(root, INT_MAX & ~1);
@@ -127,11 +120,12 @@ int main()
     writeTreeToFile(root, outputFile);
 
     /* This writes the huffman encoding in 4 bytes */
+    unsigned int * write_value = (unsigned int *) malloc(sizeof(unsigned int));
     for (int i = 0; i < inputSize; i++) {
-        std::cout << std::bitset<32>(referece[buffer[i]]->code) << std::endl;
-        fwrite(reinterpret_cast<const char *>(&referece[buffer[i]]->code), sizeof(int), 1, outputFile);
+        // std::cout << std::bitset<32>(referece[buffer[i]]->code) << std::endl;
+        int code = referece[buffer[i]]->code;        
+        fwrite(&code, sizeof(unsigned int), 1, outputFile);
     }
-
 
     fclose(inputFile);
     fclose(outputFile);

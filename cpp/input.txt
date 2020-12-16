@@ -1,1 +1,4 @@
-aye whats good
+The total number of elements successfully written is returned.
+If this number differs from the count parameter, a writing error prevented the function from completing. In this case, the error indicator (ferror) will be set for the stream.
+If either size or count is zero, the function returns zero and the error indicator remains unchanged.
+size_t is an unsigned integral type.
