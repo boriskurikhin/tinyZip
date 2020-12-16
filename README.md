@@ -1,10 +1,11 @@
-# TinyDEFLATE [WIP]
+# TinyZIP [WIP]
 
-TinyDEFLATE is my remake of the DEFLATE compression algorithm written entirely in C++ 17. It uses Huffman Encoding + LZ77 to achieve impressive amounts of compression. The idea was inspired by the show Silicon Valley and some cool guy on Discord.
+TinyZIP is my remake of the DEFLATE compression algorithm written entirely in C++ 17. It uses Huffman Encoding + LZ77 to achieve impressive amounts of compression. The idea was inspired by the show Silicon Valley and some cool guy on Discord.
 
 #### How to run?
 
 Obviously, don't use in production lol
+
 Coming soon...
 
 ### Todos
