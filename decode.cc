@@ -3,7 +3,31 @@
 #include <queue>
 #include <bitset>
 #include <stack>
+#include <string>
 #include "node.h"
+
+void undoLZ77 (char * input, int fileSize, FILE * output ) {
+    int index = 0, j = 0;
+    std::string optimizeLater;
+    while (index < fileSize) {
+        int relativePos = input[index] | ((input[index+1] & 0x0F) << 8);
+        int matchLength = (input[index + 1] & 0xF0) >> 4;
+        char nextChar = input[index + 2];
+        
+        if (matchLength) {
+            std::string prev = optimizeLater.substr(j - relativePos, matchLength);
+            fwrite(prev.c_str(), 1, matchLength, output);
+            optimizeLater += prev;
+            j += matchLength;
+        } else if (nextChar) {
+            fwrite(&nextChar, 1, 1, output);
+            optimizeLater += nextChar;
+            j += 1;
+        }
+
+        index += 3;
+    }
+}
 
 void buildEncodings(Node * root, std::string encoding) {
     if (root->isLeaf) {
@@ -20,7 +44,7 @@ std::stack<Node*> stack;
 int main()
 {
 
-    FILE *inputFile = fopen("output.boris", "rb");
+    FILE *inputFile = fopen("output.b", "rb");
     FILE *ouputFile = fopen("output.txt", "wb");
 
     int fileSize;
@@ -32,6 +56,13 @@ int main()
     /* read the encoded file */
     char buffer[fileSize];
     fread(buffer, 1, fileSize, inputFile);
+
+    undoLZ77(buffer, fileSize, ouputFile);
+
+
+    return 0;
+
+    
 
     // first 4 bytes represent the tree size
     int treeSize;
