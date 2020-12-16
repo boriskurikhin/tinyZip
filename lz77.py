@@ -26,7 +26,7 @@ def lz77rev (inp: bytes) -> bytes:
             j += 1
     return output
 
-def lz77 (inp: bytes) -> bytes:
+def lz77 (inp: bytes, file) -> bytes:
     index, output, SEARCH_SIZE, LOOKAHEAD_SIZE = 0, bytes(), 4095, 15
 
     while index < len(inp):
@@ -41,7 +41,7 @@ def lz77 (inp: bytes) -> bytes:
         output += ((0xF00 & relativePos) >> 8 | (0xF & matchLength) << 4).to_bytes(1, byteorder='little') # 4 bits of position and 4 bits of length
         output += nextChar.to_bytes(1, byteorder='little') # 8 bits of next character
         index += max(1, matchLength)
-    return output
+    file.write(output)
 
 # f = open('file.txt', 'rb')
 # enc = lz77(bytes(f.read()))
