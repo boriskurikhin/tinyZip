@@ -8,13 +8,13 @@
 
 void undoLZ77 (char * input, int fileSize, FILE * output ) {
     int index = 0, j = 0;
-    char buffer[fileSize];
     std::string running = "";
 
     while (index < fileSize) {
-        int relativePos = input[index] | ((input[index+1] & 0x0F) << 8);
+        int relativePos = ((0xFF &input[index]) | ((input[index + 1] & 0xF) << 8));
         int matchLength = (input[index + 1] & 0xF0) >> 4;
         char nextChar = input[index + 2];
+
 
         if (matchLength) {
             int subsrIndex = j - relativePos;
