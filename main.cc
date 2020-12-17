@@ -50,7 +50,7 @@ int main()
 {
 
     FILE *inputFile = fopen("output.b", "rb");
-    FILE *outputFile = fopen("both.b", "wb");
+    FILE *outputFile = fopen("huff.b", "wb");
 
     auto input = readInput(inputFile);
 

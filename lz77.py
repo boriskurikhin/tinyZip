@@ -43,7 +43,7 @@ def lz77 (inp: bytes, file) -> bytes:
         index += max(1, matchLength)
     file.write(output)
 
-f = open('input.txt', 'rb')
+f = open('huff.b', 'rb')
 ff = open('lz77.b', 'wb')
 # enc = lz77(bytes(f.read()), ff)
 enc = lz77(bytes(f.read()), ff)

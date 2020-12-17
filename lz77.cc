@@ -12,6 +12,55 @@ int min(int a, int b) {
     return a < b ? a : b;
 }
 
+void computeLPSArray(std::string pat, int* lps);
+
+int KMP (std::string pat, std::string txt)  { 
+    int M = pat.size();
+    int N = txt.size(); 
+    int lps[M]; 
+  
+    computeLPSArray(pat, lps); 
+  
+    int i = 0; // index for txt[] 
+    int j = 0; // index for pat[] 
+    while (i < N) { 
+        if (pat[j] == txt[i]) { 
+            j++; 
+            i++; 
+        } 
+  
+        if (j == M)
+            return i - j;
+  
+        else if (i < N && pat[j] != txt[i]) { 
+            if (j != 0) j = lps[j - 1]; 
+            else i = i + 1; 
+        } 
+    }
+    return -1;
+} 
+  
+void computeLPSArray(std::string pat, int* lps)  { 
+    int len = 0; 
+    lps[0] = 0;
+    int i = 1; 
+    while (i < pat.size()) { 
+        if (pat[i] == pat[len]) { 
+            len++; 
+            lps[i] = len; 
+            i++; 
+        } 
+        else { 
+             if (len != 0) { 
+                len = lps[len - 1]; 
+            } else { 
+                lps[i] = 0; 
+                i++; 
+            } 
+        } 
+    } 
+} 
+
 // find the longest match
 std::pair<int, int> findLongest(char *buffer, int SEARCH_SIZE, int LOOKAHEAD_SIZE, int idx, int N) {
 
@@ -33,8 +82,7 @@ std::pair<int, int> findLongest(char *buffer, int SEARCH_SIZE, int LOOKAHEAD_SIZ
     //that have length > 3
 
     while (find.size()) {
-        int matchIndex = search.rfind(find);
-        // std::cout << "looking for " << find << " in " << search << std::endl;
+        int matchIndex = KMP(find, search);
         if (matchIndex != -1) {
             // std::cout << matchIndex << std::endl;
             return std::make_pair(search.size() - matchIndex, find.size());
